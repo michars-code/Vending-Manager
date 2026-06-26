@@ -573,6 +573,14 @@
     cursor: pointer;
   }
 
+  .form-error {
+    font-family: -apple-system, 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--danger);
+    margin-top: -6px;
+    margin-bottom: 10px;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .digit-flip { animation: none; }
     .row-content { transition: none; }
@@ -656,6 +664,7 @@
       <label for="chickInputDate">Hatch date</label>
       <input type="date" id="chickInputDate">
     </div>
+    <div class="form-error" id="chickFormError" style="display:none;"></div>
     <div class="modal-actions">
       <button class="btn btn-secondary" id="chickCancelBtn">Cancel</button>
       <button class="btn btn-primary" id="chickSaveBtn">Save</button>
@@ -926,6 +935,7 @@
     document.getElementById('chickInputName').value = c.name;
     document.getElementById('chickInputDate').value = c.hatchDate;
     document.getElementById('chickDeleteBtn').style.display = 'block';
+    resetChickFormState();
     openChickModal();
   }
 
@@ -935,7 +945,15 @@
     document.getElementById('chickInputName').value = '';
     document.getElementById('chickInputDate').value = '';
     document.getElementById('chickDeleteBtn').style.display = 'none';
+    resetChickFormState();
     openChickModal();
+  }
+
+  function resetChickFormState() {
+    document.getElementById('chickInputName').style.borderColor = 'var(--rule)';
+    document.getElementById('chickInputDate').style.borderColor = 'var(--rule)';
+    const errEl = document.getElementById('chickFormError');
+    if (errEl) errEl.style.display = 'none';
   }
 
   function openChickModal() {
@@ -1146,8 +1164,18 @@
       const dateInput = document.getElementById('chickInputDate');
       if (!name) nameInput.style.borderColor = 'var(--danger)';
       if (!hatchDate) dateInput.style.borderColor = 'var(--danger)';
+      const errEl = document.getElementById('chickFormError');
+      if (errEl) {
+        errEl.textContent = !name && !hatchDate
+          ? 'Add a name and a hatch date.'
+          : (!name ? 'Add a name or batch label.' : 'Pick a hatch date.');
+        errEl.style.display = 'block';
+      }
       return;
     }
+
+    const errEl = document.getElementById('chickFormError');
+    if (errEl) errEl.style.display = 'none';
 
     if (editingChickId) {
       const c = chicks.find(x => x.id === editingChickId);
